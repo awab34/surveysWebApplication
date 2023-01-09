@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use App\Models\SurveyQuestion;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Arr;
 
 class SurveyController extends Controller
 {
@@ -81,6 +82,28 @@ class SurveyController extends Controller
             }
         }
         $survey->update($data);
+        // get ids as plain array of existing questions
+        $existingIds = $survey->questions()->plunk('id')->toArray();
+        // get ids as plain array of new questions
+        $newIds = Arr::plunk($data['questions'],'id');
+        // find questions to delete
+        $toDelete = array_diff($existingIds,$newIds);
+        // find questions to add
+        $toAdd = array_diff($newIds,$existingIds);
+        // delete question 
+        SurveyQuestion::destory($toDelete);
+        foreach($data['questions'] as $question){
+            if(in_array($question['id'],$toAdd)){
+                $question['survey_id'] = $survey->id;
+                $this->createQuestion($question);
+            }
+        }
+        $questionMap = collect($data['questions'])->keyBy('id');
+        foreach($survey->questions as $question){
+            if(isset($questionMap[$question->id])){
+                $this->updateQuestion($question,$questionMap[$question->id]);
+            }
+        }
         return new SurveyResource($survey);
     }
 
@@ -146,5 +169,23 @@ class SurveyController extends Controller
             'survey_id'=>'exists:App\Models\Survey,id'
         ]);
         return SurveyQuestion::create($validator->validated());
+    }
+    public function updateQuestion(SurveyQuestion $question,$data){
+        if(is_array($data['data'])){
+            $data['data'] = json_encode($data['data']);
+        }
+        $validator = Validator::make($data,[
+            'id'=>'exists:App\Models\SurveyQuestion,id',
+            'question' =>'required|string',
+            'type' => ['required',Rule::in([
+                Survey::TYPE_TEXT,
+                Survey::TYPE_TEXTAREA,
+                Survey::TYPE_SELECT,
+                Survey::TYPE_RADIO,
+                Survey::TYPE_CHECKBOX
+            ])],
+            'description'=>'nullable|string',
+            'data'=>'present',
+        ]);
     }
 }
