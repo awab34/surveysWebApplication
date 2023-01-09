@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SurveyController;
+use App\Http\Controllers\DashboardController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function (){
     });
     Route::post('/logout',[AuthController::class,'logout']);
     Route::resource('/survey', SurveyController::class);
+    Route::get('/dashboard/index', [DashboardController::class,'index']);
 });
 Route::get('/survey-by-slug/{survey:slug}',[SurveyController::class,'showForGuest'] );
 Route::get('/survey/{survey}/answer',[SurveyController::class,'storeAnswer'] );
