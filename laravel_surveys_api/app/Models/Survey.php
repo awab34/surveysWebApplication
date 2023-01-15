@@ -4,8 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use App\Models\SurveyAnswer;
+use App\Models\SurveyQuestion;
 
 class Survey extends Model
 {
@@ -17,14 +20,14 @@ class Survey extends Model
     const TYPE_CHECKBOX = 'checkbox';
     protected $fillable = ['title','image','slug','status','description','expire_date','user_id'];
     public function getSlugOptions(): SlugOptions{
-        return SlugOptions::create()->generateSlugsForm('title')->saveSlugsTo('slug');
+        return SlugOptions::create()
+            ->generateSlugsFrom('title')
+            ->saveSlugsTo('slug');
     }
     public function questions(){
-        return $this->hasMany(SurveyQuestion::class);
-        
+        return $this->hasMany(SurveyQuestion::class,'survey_id', 'id');
     }
-    public function answers(){
-        return $this->hasMany(SurveyAnswer::class);
-        
+    public function answers(): hasMany{
+        return $this->hasMany(SurveyAnswer::class,'survey_id', 'id');
     }
 }

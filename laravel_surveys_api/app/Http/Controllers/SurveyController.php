@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Arr;
 use App\Models\SurveyQuestionAnswer;
 use App\Models\SurveyAnswer;
+use App\Http\Controllers\Exception;
 
 class SurveyController extends Controller
 {
@@ -112,15 +113,16 @@ class SurveyController extends Controller
         }
         $survey->update($data);
         // get ids as plain array of existing questions
-        $existingIds = $survey->questions()->plunk('id')->toArray();
+        $existingIds = $survey->questions()->pluck('id')->toArray();
         // get ids as plain array of new questions
-        $newIds = Arr::plunk($data['questions'],'id');
+        $newIds = Arr::pluck($data['questions'],'id');
         // find questions to delete
         $toDelete = array_diff($existingIds,$newIds);
         // find questions to add
         $toAdd = array_diff($newIds,$existingIds);
         // delete question 
-        SurveyQuestion::destory($toDelete);
+        $surveyQuestion = new SurveyQuestion();
+        $surveyQuestion->delete($toDelete);
         foreach($data['questions'] as $question){
             if(in_array($question['id'],$toAdd)){
                 $question['survey_id'] = $survey->id;

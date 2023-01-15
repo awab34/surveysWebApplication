@@ -25,7 +25,7 @@ class StoreSurveyRequest extends FormRequest
      * @return array<string, mixed>
      */
     public function rules()
-    {$table->foreignIdFor(\App\Models\User::class,'user_id');
+    {
         return [
             'title' => 'required|string|max:1000',
             'image'=>'nullable|string',
