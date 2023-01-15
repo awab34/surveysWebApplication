@@ -17,6 +17,7 @@ use Illuminate\Support\Arr;
 use App\Models\SurveyQuestionAnswer;
 use App\Models\SurveyAnswer;
 use App\Http\Controllers\Exception;
+use App\Http\Controllers\DB;
 
 class SurveyController extends Controller
 {
@@ -121,8 +122,7 @@ class SurveyController extends Controller
         // find questions to add
         $toAdd = array_diff($newIds,$existingIds);
         // delete question 
-        $surveyQuestion = new SurveyQuestion();
-        $surveyQuestion->delete($toDelete);
+        SurveyQuestion::destroy($toDelete);
         foreach($data['questions'] as $question){
             if(in_array($question['id'],$toAdd)){
                 $question['survey_id'] = $survey->id;
@@ -218,5 +218,9 @@ class SurveyController extends Controller
             'description'=>'nullable|string',
             'data'=>'present',
         ]);
+        \DB::table('survey_questions')
+              ->where('id', $data['id'])
+              ->update($data);
+        
     }
 }
