@@ -144,7 +144,7 @@ class SurveyController extends Controller
      * @param  \App\Models\Survey  $survey
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Survey $survey)
+    public function destroy(Survey $survey,Request $request)
     {
         $user = $request->user();
         if($user->id !== $survey->user_id){
@@ -154,7 +154,9 @@ class SurveyController extends Controller
             $absolutePath = public_path($survey->$image);
             File::delete($absolutePath);
         }
+        $toDelete = $survey->questions()->pluck('id')->toArray();
         $survey->delete();
+        SurveyQuestion::destroy($toDelete);
         return response('',204);
     }
     public function saveImage($image){

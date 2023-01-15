@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\DateTime;
 
 class SurveyResourceDashboard extends JsonResource
 {
@@ -21,7 +22,7 @@ class SurveyResourceDashboard extends JsonResource
             'slug' => $this->slug,
             'status'=>$this->status,
             'expire_date'=>$this->expire_date,
-            'created_at'=>(new DateTime($this->created_at))->format('Y-m-d H:i:s'),
+            'created_at'=>(new \DateTime($this->created_at))->format('Y-m-d H:i:s'),
             'questions'=>$this->questions()->count(),
             'answers'=>$this->answers()->count(),
         ];

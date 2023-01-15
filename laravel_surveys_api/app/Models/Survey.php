@@ -27,7 +27,7 @@ class Survey extends Model
     public function questions(){
         return $this->hasMany(SurveyQuestion::class,'survey_id', 'id');
     }
-    public function answers(): hasMany{
+    public function answers(){
         return $this->hasMany(SurveyAnswer::class,'survey_id', 'id');
     }
 }
